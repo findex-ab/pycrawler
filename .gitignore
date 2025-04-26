@@ -250,3 +250,4 @@ tags
 # End of https://www.toptal.com/developers/gitignore/api/python,pep8,flake8,vim,emacs
 /*.db
 *.db-journal
+/data/

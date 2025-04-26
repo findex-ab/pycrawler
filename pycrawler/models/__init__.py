@@ -5,8 +5,8 @@ class BaseDocument(mongoengine.Document):
         'abstract': True
     }
 
-    updated_at = mongoengine.DateTimeField(default=datetime.now)
-    created_at = mongoengine.DateTimeField(default=datetime.now)
+    updated_at = mongoengine.DateTimeField(default=datetime.utcnow)
+    created_at = mongoengine.DateTimeField(default=datetime.utcnow)
 
     def save(self, *args, **kwargs):
         if not self.created_at:
@@ -36,19 +36,68 @@ class BaseDocument(mongoengine.Document):
 
         return cls.objects.get(**query)
     
-class Image(BaseDocument):
-    src = mongoengine.StringField(required=True, unique=True)
-    name = mongoengine.StringField(required=False)
-
-class Website(BaseDocument):
+class CrawlerImage(BaseDocument):
+    category = mongoengine.StringField(required=True, default='IMAGE') 
     url = mongoengine.StringField(required=True, unique=True)
+    domain = mongoengine.StringField(required=True)
     name = mongoengine.StringField(required=False)
-    articles = mongoengine.ListField(mongoengine.ReferenceField('Article'), required=False, default=[])
-    images = mongoengine.ListField(mongoengine.ReferenceField(Image), required=False, default=[])
 
-class Article(BaseDocument):
+    meta = {
+        'indexes': [
+            '$name'
+        ]
+    }
+
+class CrawlerFile(BaseDocument):
+    category = mongoengine.StringField(required=True, default='FILE') 
+    url = mongoengine.StringField(required=True, unique=True)
+    domain = mongoengine.StringField(required=True)
+    name = mongoengine.StringField(required=True)
+    extension = mongoengine.StringField(required=True) 
+
+    meta = {
+        'indexes': [
+            '$name',
+            'domain'
+        ]
+    }
+    
+class CrawlerWebsite(BaseDocument):
+    category = mongoengine.StringField(required=True, default='WEBSITE') 
+    url = mongoengine.StringField(required=True, unique=True)
+    domain = mongoengine.StringField(required=True)
+    name = mongoengine.StringField(required=False)
+    articles = mongoengine.ListField(mongoengine.ReferenceField('CrawlerArticle'), required=False, default=[])
+    images = mongoengine.ListField(mongoengine.ReferenceField(CrawlerImage), required=False, default=[])
+    files = mongoengine.ListField(mongoengine.ReferenceField(CrawlerFile), required=False, default=[])
+    keywords = mongoengine.ListField(mongoengine.StringField(), required=False, default=[])
+
+    # https://docs.mongoengine.org/guide/defining-documents.html#indexes
+    meta = {
+        'indexes': [
+            '$name',
+            'keywords'
+        ]
+    }
+
+    def get_random(n: int):
+        pipeline = [
+            {'$sample': {'size': n}}
+        ]
+        return list(CrawlerWebsite.objects.aggregate(*pipeline))
+
+class CrawlerArticle(BaseDocument):
+    category = mongoengine.StringField(required=True, default='ARTICLE') 
     uid = mongoengine.StringField(required=True, unique=True)
     url = mongoengine.StringField(required=True)
+    domain = mongoengine.StringField(required=True)
     name = mongoengine.StringField(required=False)
     text = mongoengine.StringField(required=True)
-    images = mongoengine.ListField(mongoengine.ReferenceField(Image), required=False, default=[])
+    images = mongoengine.ListField(mongoengine.ReferenceField(CrawlerImage), required=False, default=[])
+
+    meta = {
+        'indexes': [
+            '$text',
+            'name'
+        ]
+    }
