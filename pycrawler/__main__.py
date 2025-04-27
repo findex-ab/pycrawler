@@ -8,6 +8,7 @@ parser.add_argument('seed', type=str, help="JSON file containing an array of URL
 parser.add_argument('--threads', type=int, help="Number of threads", default=12)
 parser.add_argument('--qdrant_enabled', type=bool, help="Enable qdrant", default=False)
 parser.add_argument('--qdrant_string', type=str, help="qdrant connection string", default="http://localhost:6333")
+parser.add_argument('--mongo_url', type=str, help="mongodb connection string", default='mongodb://127.0.0.1:27013/test')
 args = parser.parse_args()
 
 if __name__ == '__main__':

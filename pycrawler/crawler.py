@@ -206,7 +206,7 @@ def crawl(
         urls: typing.List[str] = [],
         config: CrawlerConfig = CrawlerConfig()
 ):
-    connect_db()
+    connect_db(host=config.mongo_url)
 
     CrawlerWebsite.ensure_indexes()
     CrawlerArticle.ensure_indexes()
