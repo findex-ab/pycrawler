@@ -21,6 +21,7 @@ if __name__ == '__main__':
         ],
         num_threads=args.threads,
         qdrant_enabled=args.qdrant_enabled,
-        qdrant_string=args.qdrant_string
+        qdrant_string=args.qdrant_string,
+        mongo_url=args.mongo_url
     )
     crawl(urls=urls, config=config)
