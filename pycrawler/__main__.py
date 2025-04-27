@@ -1,59 +1,25 @@
 from pycrawler.crawler import Crawler, crawl
+from pycrawler.config import CrawlerConfig
+import argparse
+import json
+
+parser = argparse.ArgumentParser()
+parser.add_argument('seed', type=str, help="JSON file containing an array of URLS")
+parser.add_argument('--threads', type=int, help="Number of threads", default=12)
+parser.add_argument('--qdrant_enabled', type=bool, help="Enable qdrant", default=False)
+parser.add_argument('--qdrant_string', type=str, help="qdrant connection string", default="http://localhost:6333")
+args = parser.parse_args()
 
 if __name__ == '__main__':
-    crawl(urls=[
-        "https://www.gutenberg.org/",
-        "https://www.harvard.edu/",
-        "https://www.chalmers.se/",
-        "https://www.gu.se/",
-        "https://www.w3schools.com/",
-        "https://www.wolframalpha.com/",
-        "https://quickmath.com/",
-        "https://www.pluggakuten.se/",
-        "https://www.sas.se/",
-        "https://www.fortnox.se/",
-        "https://www.swedishmatch.se/",
-        "https://xn--skmotorn-n4a.se/",
-        "https://9gag.com/",
-        "https://store.steampowered.com/",
-        "https://www.nytimes.com/",
-        "https://www.expressen.se/",
-        "https://jquery.com/",
-        "https://www.ica.se/",
-        "https://www.coop.se/",
-        "https://www.flashback.org/",
-        "https://asp.net",
-        "https://8kun.top/index.html",
-        "https://boards.4chan.org/",
-        "https://www.reddit.com/",
-        "https://news.ycombinator.com/",
-        "https://www.breakit.se/",
-        "https://www.cnbc.com/world/?region=world",
-        "https://www.marketwatch.com/",
-        "https://www.reuters.com/markets/",
-        "https://www.aftonbladet.se/",
-        "https://www.gp.se/",
-        "https://forum.placera.se/",
-        "https://www.avanza.se/start",
-        "https://www.di.se/",
-        "https://www.msn.com/",
-        "https://coinmarketcap.com/",
-        "https://www.findex.se/",
-        "https://www.svt.se/nyheter/ekonomi/",
-        "https://efn.se/",
-        "https://www.privataaffarer.se/",
-        "https://www.investing.com/news/latest-news",
-        "https://www.fi.se/",
-        "https://www.thestreet.com/",
-        "https://lobste.rs/",
-        "https://www.bbc.com/",
-        "https://www.netonnet.se/",
-        "https://www.elgiganten.se/",
-        "https://www.etsy.com/",
-        "https://www.ebay.com/",
-        "https://www.allabolag.se/",
-        "https://dev.to/"
-    ], num_threads=12, blacklist=[
-        'https://donate\.wikipedia.*?',
-        'https://donate\.wikimedia.*?'
-    ])
+    urls = json.loads(open(args.seed).read())
+
+    config = CrawlerConfig(
+        blacklist=[
+            'https://donate\.wikipedia.*?',
+            'https://donate\.wikimedia.*?'
+        ],
+        num_threads=args.threads,
+        qdrant_enabled=args.qdrant_enabled,
+        qdrant_string=args.qdrant_string
+    )
+    crawl(urls=urls, config=config)

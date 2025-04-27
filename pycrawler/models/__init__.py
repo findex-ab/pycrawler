@@ -41,10 +41,17 @@ class CrawlerImage(BaseDocument):
     url = mongoengine.StringField(required=True, unique=True)
     domain = mongoengine.StringField(required=True)
     name = mongoengine.StringField(required=False)
+    language = mongoengine.StringField(required=False)
+    keywords = mongoengine.ListField(mongoengine.StringField(), required=False, default=[])
 
     meta = {
+        'index_opts': {
+            'language_override': 'lang'
+        },
         'indexes': [
-            '$name'
+            '$name',
+            'keywords',
+            'language'
         ]
     }
 
@@ -53,12 +60,19 @@ class CrawlerFile(BaseDocument):
     url = mongoengine.StringField(required=True, unique=True)
     domain = mongoengine.StringField(required=True)
     name = mongoengine.StringField(required=True)
+    language = mongoengine.StringField(required=False)
     extension = mongoengine.StringField(required=True) 
+    keywords = mongoengine.ListField(mongoengine.StringField(), required=False, default=[])
 
     meta = {
+        'index_opts': {
+            'language_override': 'lang'
+        },
         'indexes': [
             '$name',
-            'domain'
+            'domain',
+            'keywords',
+            'language'
         ]
     }
     
@@ -67,6 +81,7 @@ class CrawlerWebsite(BaseDocument):
     url = mongoengine.StringField(required=True, unique=True)
     domain = mongoengine.StringField(required=True)
     name = mongoengine.StringField(required=False)
+    language = mongoengine.StringField(required=False)
     articles = mongoengine.ListField(mongoengine.ReferenceField('CrawlerArticle'), required=False, default=[])
     images = mongoengine.ListField(mongoengine.ReferenceField(CrawlerImage), required=False, default=[])
     files = mongoengine.ListField(mongoengine.ReferenceField(CrawlerFile), required=False, default=[])
@@ -74,8 +89,12 @@ class CrawlerWebsite(BaseDocument):
 
     # https://docs.mongoengine.org/guide/defining-documents.html#indexes
     meta = {
+        'index_opts': {
+            'language_override': 'lang'
+        },
         'indexes': [
             '$name',
+            'language',
             'keywords'
         ]
     }
@@ -92,12 +111,25 @@ class CrawlerArticle(BaseDocument):
     url = mongoengine.StringField(required=True)
     domain = mongoengine.StringField(required=True)
     name = mongoengine.StringField(required=False)
+    language = mongoengine.StringField(required=False)
     text = mongoengine.StringField(required=True)
     images = mongoengine.ListField(mongoengine.ReferenceField(CrawlerImage), required=False, default=[])
+    keywords = mongoengine.ListField(mongoengine.StringField(), required=False, default=[])
+    links = mongoengine.ListField(mongoengine.StringField(), required=False, default=[])
+    link = mongoengine.StringField(required=True)
+    source_date = mongoengine.DateTimeField(default=datetime.utcnow, required=True)
 
     meta = {
+        'index_opts': {
+            'language_override': 'lang'
+        },
         'indexes': [
             '$text',
-            'name'
+            'name',
+            'keywords',
+            'language',
+            'links',
+            'link',
+            'source_date'
         ]
     }

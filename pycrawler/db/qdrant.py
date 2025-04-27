@@ -9,7 +9,7 @@ def setup_qdrant(qdrant: QdrantClient) -> QdrantClient:
     return qdrant
 
 
-def qdrant_connect():
-    qdrant = QdrantClient("http://localhost:6333") # Connect to existing Qdrant instance
+def qdrant_connect(connection_string: str = "http://localhost:6333"):
+    qdrant = QdrantClient(connection_string) # Connect to existing Qdrant instance
     return setup_qdrant(qdrant)
 
